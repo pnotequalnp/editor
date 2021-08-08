@@ -1,0 +1,77 @@
+cabal-version: 3.0
+name:          editor
+version:       0.1.0.0
+license:       ISC
+license-file:  LICENSE
+author:        Kevin Mullins
+maintainer:    kevin@pnotequalnp.com
+copyright:     Kevin Mullins 2021
+
+common default
+  default-language:   Haskell2010
+  ghc-options:        -Wall
+  build-depends:
+    , base        ^>=4.14.1.0
+    , containers
+    , groups
+    , lens
+    , network
+    , store
+    , text
+    , unliftio
+    , vector
+
+  default-extensions:
+    BlockArguments
+    DeriveAnyClass
+    DeriveGeneric
+    DerivingVia
+    FlexibleContexts
+    GeneralizedNewtypeDeriving
+    ImportQualifiedPost
+    LambdaCase
+    OverloadedStrings
+    TemplateHaskell
+    TypeApplications
+    TypeFamilies
+    ViewPatterns
+
+library
+  import:          default
+  hs-source-dirs:  lib
+  exposed-modules:
+    Editor.Buffer
+    Editor.Diff
+    Editor.Message
+
+library client-lib
+  import:          default
+  visibility:      public
+  hs-source-dirs:  client
+  build-depends:   editor:editor
+  exposed-modules:
+    Editor.Client
+    Editor.Client.Network
+    Editor.Client.Network.Unix
+
+library server-lib
+  import:          default
+  visibility:      public
+  hs-source-dirs:  server
+  build-depends:   editor:editor
+  exposed-modules:
+    Editor.Server
+    Editor.Server.Network
+    Editor.Server.Network.Unix
+
+executable client
+  import:         default
+  hs-source-dirs: app
+  main-is:        Client.hs
+  build-depends:  editor:{editor,client-lib}
+
+executable server
+  import:         default
+  hs-source-dirs: app
+  main-is:        Server.hs
+  build-depends:  editor:{editor,server-lib}
