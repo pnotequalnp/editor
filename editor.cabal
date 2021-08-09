@@ -15,6 +15,7 @@ common default
     , containers
     , groups
     , lens
+    , mtl
     , network
     , store
     , text

@@ -4,16 +4,17 @@ import Data.Store (decodeEx, encode)
 import Editor.Server.Network qualified as S
 import Network.Socket qualified as N
 import Network.Socket.ByteString qualified as N
+import UnliftIO (liftIO)
 
 newtype UnixSocket = UnixSocket N.Socket
 
 instance S.Connection UnixSocket where
-  receive (UnixSocket sock) = decodeEx <$> N.recv sock 4096
-  send (UnixSocket sock) msg = N.sendAll sock $ encode msg
+  receive (UnixSocket sock) = fmap decodeEx . liftIO $ N.recv sock 4096
+  send (UnixSocket sock) = liftIO . N.sendAll sock . encode
 
 instance S.Listen UnixSocket where
   type Conn UnixSocket = UnixSocket
-  accept (UnixSocket sock) = UnixSocket . fst <$> N.accept sock
+  accept (UnixSocket sock) = fmap (UnixSocket . fst) . liftIO $ N.accept sock
 
 init :: FilePath -> IO UnixSocket
 init fp = do
