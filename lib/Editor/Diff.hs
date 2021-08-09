@@ -1,13 +1,10 @@
 module Editor.Diff where
 
--- import Control.Lens
-
+import Control.Lens
 import Data.Group (Group (..))
 import Data.Store ()
 import Data.Store.TH (makeStore)
 import Data.Text (Text)
-
--- import Data.Vector (Vector)
 
 data Operation
   = InsertLine Int Text
@@ -26,7 +23,7 @@ newtype Diff = Diff
 makeStore ''Diff
 
 instance Group Diff where
-  invert = Diff . reverse . fmap undo . getDiff
+  invert = over coerced $ reverse . fmap undo
 
 undo :: Operation -> Operation
 undo = \case
