@@ -43,6 +43,7 @@ library
     Editor.Buffer
     Editor.Diff
     Editor.Message
+    Editor.Network
 
 library client-lib
   import:          default
