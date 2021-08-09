@@ -23,7 +23,12 @@ data Opts = Opts
   }
 
 main :: IO ()
-main = execParser (info parser mempty) >>= execute
+main = execParser (info parser cliOpts) >>= execute
+  where
+    cliOpts =
+      fold
+        [ progDesc "Basic text editor. Almost certainly not useful."
+        ]
 
 execute :: Opts -> IO ()
 execute Opts {mode, path} = do
@@ -31,9 +36,6 @@ execute Opts {mode, path} = do
   case mode of
     Client -> Client.Unix.init addr >>= Client.main
     Server -> Server.Unix.init addr >>= Server.main
-
-getPath :: IO String
-getPath = error "not implemented"
 
 parser :: Parser Opts
 parser = opts <**> helper <**> versioner
