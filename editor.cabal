@@ -30,6 +30,7 @@ common default
     GeneralizedNewtypeDeriving
     ImportQualifiedPost
     LambdaCase
+    NamedFieldPuns
     OverloadedStrings
     TemplateHaskell
     TypeApplications
@@ -76,3 +77,12 @@ executable server
   hs-source-dirs: app
   main-is:        Server.hs
   build-depends:  editor:{editor,server-lib}
+
+executable editor
+  import:         default
+  hs-source-dirs: app
+  main-is:        Main.hs
+  other-modules:  Paths_editor
+  build-depends:
+    , editor:{client-lib,editor,server-lib}
+    , optparse-applicative
