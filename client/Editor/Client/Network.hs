@@ -1,7 +1,8 @@
 module Editor.Client.Network where
 
 import Editor.Message (ClientMessage, ServerMessage)
+import UnliftIO (MonadIO)
 
 class Connection conn where
-  receive :: conn -> IO ServerMessage
-  send :: conn -> ClientMessage -> IO ()
+  receive :: MonadIO m => conn -> m ServerMessage
+  send :: MonadIO m => conn -> ClientMessage -> m ()
