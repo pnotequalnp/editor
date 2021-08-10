@@ -48,10 +48,14 @@ library
     Editor.Network
 
 library client-lib
-  import:          default
-  visibility:      public
-  hs-source-dirs:  client
-  build-depends:   editor:editor
+  import:         default
+  visibility:     public
+  hs-source-dirs: client
+  build-depends:
+    , editor:editor
+    , brick
+    , vty
+
   exposed-modules:
     Editor.Client
     Editor.Client.Network
@@ -73,6 +77,7 @@ executable client
   import:         default
   hs-source-dirs: app
   main-is:        Client.hs
+  ghc-options:    -threaded
   build-depends:  editor:{editor,client-lib}
 
 executable server
@@ -86,6 +91,7 @@ executable editor
   hs-source-dirs: app
   main-is:        Main.hs
   other-modules:  Paths_editor
+  ghc-options:    -threaded
   build-depends:
     , editor:{client-lib,editor,server-lib}
     , optparse-applicative
