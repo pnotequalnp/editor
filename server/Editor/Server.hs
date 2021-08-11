@@ -2,12 +2,13 @@ module Editor.Server where
 
 import Control.Lens
 import Control.Monad (forever)
-import Control.Monad.Reader
+import Control.Monad.Reader (MonadReader (..), ReaderT (..))
 import Data.IntMap (IntMap)
 import Data.IntMap qualified as IM
 import Editor.Buffer (Buffer, newBuffer)
-import Editor.Message (ClientMessage (..))
+import Editor.Message (ClientMessage (..), ServerMessage (..))
 import Editor.Server.Network (Connection (..), Listen (..))
+import UnliftIO (MonadIO (..))
 import UnliftIO.Async (async)
 import UnliftIO.STM
 
@@ -28,12 +29,11 @@ main sock = do
     accept sock >>= async . server env
 
 server :: (MonadIO m, Connection conn) => Env -> conn -> m ()
-server env conn = flip runReaderT env do
+server env conn = flip runReaderT env $ forever do
+  send conn $ ServerMessage ()
   msg <- receive conn
-  liftIO $ putStrLn "Received"
   handler msg
-  liftIO $ putStrLn "Handled:"
-  view buffers >>= readTVarIO >>= liftIO . print
+  send conn $ ServerMessage ()
 
 handler :: (MonadReader Env m, MonadIO m) => ClientMessage -> m ()
 handler = \case
