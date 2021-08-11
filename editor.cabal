@@ -28,6 +28,7 @@ common default
     DeriveGeneric
     DerivingVia
     FlexibleContexts
+    ExistentialQuantification
     GeneralizedNewtypeDeriving
     ImportQualifiedPost
     LambdaCase

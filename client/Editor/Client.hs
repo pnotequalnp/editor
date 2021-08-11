@@ -1,18 +1,19 @@
 module Editor.Client where
 
 import Brick qualified as B
-import Editor.Client.Network (Connection (..))
+import Editor.Client.Network (Conn (..), Connection (..))
 import Editor.Message (ClientMessage (..))
 import Graphics.Vty qualified as V
 
-data AppState = AppState
+newtype AppState = AppState {stateConn :: Conn}
+
 data ResourceName = ResourceName deriving stock (Eq, Ord)
+
 data Event = Event
 
 main :: Connection conn => conn -> IO ()
 main conn = do
-  send conn NewBuffer
-  let initialState = AppState
+  let initialState = AppState {stateConn = Conn conn}
   _finalState <- B.defaultMain app initialState
   pure ()
 
@@ -32,9 +33,15 @@ draw _s = [B.emptyWidget]
 chooseCursor :: AppState -> [B.CursorLocation ResourceName] -> Maybe (B.CursorLocation ResourceName)
 chooseCursor _s _ = Nothing
 
-handleEvent :: AppState -> B.BrickEvent ResourceName e -> B.EventM ResourceName (B.Next AppState)
-handleEvent s (B.VtyEvent (V.EvKey (V.KChar 'q') [])) = B.halt s
-handleEvent s _ = B.continue s
+handleEvent :: AppState -> B.BrickEvent ResourceName Event -> B.EventM ResourceName (B.Next AppState)
+handleEvent s (B.VtyEvent (V.EvKey k ms)) = handleKey s k ms
+handleEvent s (B.AppEvent _e) = B.continue s
+handleEvent s _e = B.continue s
+
+handleKey :: AppState -> V.Key -> [V.Modifier] -> B.EventM ResourceName (B.Next AppState)
+handleKey s (V.KChar 'q') _ms = B.halt s
+handleKey s (V.KChar 'n') _ms = send (stateConn s) NewBuffer *> B.continue s
+handleKey s _k _ms = B.continue s
 
 startEvent :: AppState -> B.EventM ResourceName AppState
 startEvent = pure
